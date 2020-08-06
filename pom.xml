@@ -4,4 +4,10 @@
   <artifactId>Mock2</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <modules>
+  	<module>UI</module>
+  	<module>Common</module>
+  	<module>Network</module>
+  	<module>API</module>
+  </modules>
 </project>
