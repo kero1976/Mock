@@ -15,5 +15,15 @@
 			<artifactId>Common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+				<dependency>
+			<groupId>hoge.mock</groupId>
+			<artifactId>UI</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+				<dependency>
+			<groupId>hoge.mock</groupId>
+			<artifactId>Network</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
