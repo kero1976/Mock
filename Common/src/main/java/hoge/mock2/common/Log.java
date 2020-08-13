@@ -5,13 +5,11 @@ import java.time.format.DateTimeFormatter;
 
 public class Log {
 
-	public static void sysout(String msg) {
-
-
+	public synchronized static void sysout(String msg) {
 
 		System.out.print(getTime() + ":");
-		System.out.print(String.format("%-30s", getClassName()));
-
+		System.out.print(String.format("%-40s", getClassName()));
+		System.out.print(getThreadId());
 
 		System.out.println(msg);
 	}
@@ -26,5 +24,9 @@ public class Log {
 	private static String getClassName() {
 		StackTraceElement[] ste = new Throwable().getStackTrace();
 		return ste[2].getClassName();
+	}
+
+	private static String getThreadId() {
+		return String.format("%-5d", Thread.currentThread().getId());
 	}
 }

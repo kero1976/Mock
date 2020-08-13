@@ -40,8 +40,11 @@ public class View {
 		shell.layout();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
-				OutputText.setText(Result.getData());
+				OutputText.setText(Result.getViewData());
 				shell.redraw();
+				if(Result.isCancel()) {
+
+				}
 				display.sleep();
 			}
 		}
@@ -67,11 +70,17 @@ public class View {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Log.sysout("中断ボタンが押されました");
-				Result.setResult("2");
+				Result.setCancel();
+				close();
 			}
 		});
 		btnNewButton.setBounds(122, 117, 198, 81);
 		btnNewButton.setText("中断");
 
+	}
+
+	public void cancel() {
+		Log.sysout("キャンセルが呼ばれました");
+		close();
 	}
 }

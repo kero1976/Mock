@@ -22,12 +22,14 @@ class Fake {
 			// Thread.sleep(sec);
 			for(int i =0; i < sec; i++) {
 				Thread.sleep(1000);
-				Result.setData(i + "");
+				Result.setViewData(i + "");
 			}
+			// 通信が完了したので終了コードをセットする
+			Result.setResult("0");
 			Log.sysout("通信ダミー処理を終了します。");
 		} catch (InterruptedException e) {
 			Log.sysout("通信ダミー処理が終了しませんでした。");
-			throw new NetworkException(KIND.SLEEP_ERROR, e.toString());
+			throw new NetworkException(KIND.NETWORK_ERROR, e.toString());
 		}
 	}
 }

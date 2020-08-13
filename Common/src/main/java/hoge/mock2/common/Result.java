@@ -2,18 +2,20 @@ package hoge.mock2.common;
 
 public class Result {
 
-	static String _result;
+	private static String _result = "";
 
-	static String _data = "-1";
+	private static String _viewData = "";
 
+	private static boolean _isCancel = false;
 
+	private static boolean _isTimeout = false;
 
-	public static String getData() {
-		return _data;
+	public static String getViewData() {
+		return _viewData;
 	}
 
-	public static void setData(String _data) {
-		Result._data = _data;
+	public static void setViewData(String _data) {
+		Result._viewData = _data;
 	}
 
 	public static int getResult() {
@@ -24,4 +26,20 @@ public class Result {
 		_result = val;
 	}
 
+	public static void setCancel() {
+		_isCancel = true;
+		setResult("2");
+	}
+
+	public static boolean isCancel() {
+		return _isCancel;
+	}
+
+	public static void setTimeout() {
+		_isTimeout = true;
+	}
+
+	public static boolean isTimeout() {
+		return _isTimeout;
+	}
 }

@@ -6,7 +6,8 @@ public class NetworkException extends AppException {
 
 	public enum KIND{
 		TIME_CHECK_ERR,
-		SLEEP_ERROR
+		NETWORK_ERROR,
+		TIMER_ERROR
 	}
 
 	private KIND _kind;
@@ -21,11 +22,13 @@ public class NetworkException extends AppException {
 	public String getMessage() {
 		switch(_kind) {
 		case TIME_CHECK_ERR:
-			return "時間の値が不正です。" + _message;
-		case SLEEP_ERROR:
-			return "ダミー通信中にエラーが発生しました" + _message;
+			return "【例外】時間の値が不正です。" + _message;
+		case NETWORK_ERROR:
+			return "【例外】ダミー通信中にエラーが発生しました" + _message;
+		case TIMER_ERROR:
+			return "【例外】タイマーにエラーが発生しました" + _message;
 		default:
-			return "予期せぬエラーが発生";
+			return "【例外】予期せぬエラーが発生";
 		}
 	}
 }
