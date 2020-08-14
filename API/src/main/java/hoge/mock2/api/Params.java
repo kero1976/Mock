@@ -33,6 +33,7 @@ class Params {
 
 		try {
 			int val = Integer.parseInt(mutuushinFlg);
+			// 1の場合は無通信ON。0および1以外の値はすべてOFFとする。
 			if(val == 1) {
 				_mutuushinFlg = true;
 			}else {

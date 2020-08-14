@@ -18,9 +18,59 @@ public class NetworkSample {
 	private int _watchTime;
 	private boolean _mutuushinFlg;
 
-	public NetworkSample(int networkTIme, int watchTime) {
+	public NetworkSample(int networkTIme, int watchTime, boolean mutuushinFlg) {
 		this._networkTime = networkTIme;
 		this._watchTime = watchTime;
+		this._mutuushinFlg = mutuushinFlg;
+	}
+
+
+	private Future<Void> threadTimer(CompletionService<Void> taskCompletionService){
+        return taskCompletionService.submit(new Callable<Void>(){
+	          public Void call() {
+	            try {
+	        		Watcher watcher = new Watcher();
+	        		watcher.timer(_watchTime);
+	            } catch (NetworkException e) {
+	            	Log.sysout(e.getMessage());
+	            }
+	            return null;
+	          }});
+	}
+
+	private Future<Void> threadNetwork(CompletionService<Void> taskCompletionService){
+        return taskCompletionService.submit(new Callable<Void>(){
+	          public Void call() {
+	            try {
+	        		Fake network = new Fake();
+	        		network.execute(_networkTime);
+	            } catch (NetworkException e) {
+	            	Log.sysout(e.getMessage());
+	            }
+	            return null;
+	          }});
+	}
+
+	private ExecutorService startThreadPool() {
+		return Executors.newFixedThreadPool(3);
+	}
+
+	private void stopThreadPool(ExecutorService taskExecutor) {
+	    taskExecutor.shutdown();
+	    while(true) {
+	    	if(taskExecutor.isShutdown()) {
+	    		Log.sysout("スレッドが終了しました");
+	    		return;
+	    	}else {
+	    		Log.sysout("スレッド終了待ち");
+	    		try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					Log.sysout("スレッド終了待ちで例外が発生");
+					return;
+				}
+	    	}
+	    }
 	}
 
 	/**
@@ -31,44 +81,24 @@ public class NetworkSample {
 
 		check(_networkTime);
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool(3);
+        ExecutorService taskExecutor = startThreadPool();
+
         CompletionService<Void> taskCompletionService = new ExecutorCompletionService<Void>(taskExecutor);
 
-
-        Future<Void> timer = taskCompletionService.submit(new Callable<Void>(){
-	          public Void call() {
-	            try {
-	        		Watcher watcher = new Watcher();
-	        		watcher.timer(_watchTime);
-	            } catch (NetworkException e) {
-	            	Log.sysout(e.getMessage());
-	            }
-	            return null;
-	          }});
-
-        Future<Void> network = taskCompletionService.submit(new Callable<Void>(){
-	          public Void call() {
-	            try {
-	        		Fake network = new Fake();
-	        		network.execute(_networkTime);
-	            } catch (NetworkException e) {
-	            	Log.sysout(e.getMessage());
-	            }
-	            return null;
-	          }});
+        Future<Void> timer = threadTimer(taskCompletionService);
+        Future<Void> network = threadNetwork(taskCompletionService);
 
 	    try {
 	    	while(true) {
-		    	//Log.sysout("pollを実行します");
 		    	if(Result.isCancel()) {
 		    		Log.sysout("通信処理を中断します");
 		    		timer.cancel(true);
 		    		network.cancel(true);
-		    		break;
+		    		return Result.getResult();
 		    	}
 				Future<Void> result = taskCompletionService.poll();
 				if(result == null) {
-					//Log.sysout("結果を取得できませんでした");
+					Thread.sleep(1000);
 				}else {
 					Log.sysout("通信かタイマーのどちらかが完了しました");
 					try {
@@ -78,34 +108,33 @@ public class NetworkSample {
 						return returnCode;
 					}catch(Exception e) {
 						Log.sysout("リターンコードがセットされていませんでした");
-
+						if(_mutuushinFlg) {
+							Log.sysout("無通信と判断し処理を終了します");
+							network.cancel(true);
+							return 1;
+						}else {
+							Log.sysout("無通信ではないので処理終了まで待機します。");
+							while(!network.isDone()) {
+								Thread.sleep(500);
+						    	if(Result.isCancel()) {
+						    		Log.sysout("通信処理を中断します");
+						    		network.cancel(true);
+						    		return Result.getResult();
+						    	}
+							}
+							network.get();
+							return 1;
+						}
 					}
-					break;
 				}
-		    	//Log.sysout("pollを実行しました");
-		    	Thread.sleep(1000);
 	    	}
-
-
 		} catch (Exception e) {
 			Log.sysout("メイン処理で例外が発生" + e.toString());
+			throw new NetworkException(KIND.NETWORK_ERROR, e.toString());
+		}finally {
+		    stopThreadPool(taskExecutor);
+			cleanup();
 		}
-	    taskExecutor.shutdown();
-	    while(true) {
-	    	if(taskExecutor.isShutdown()) {
-	    		Log.sysout("スレッドが終了しました");
-	    		break;
-	    	}else {
-	    		Log.sysout("スレッド終了待ち");
-	    		try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					Log.sysout("スレッド終了待ちで例外が発生");
-				}
-	    	}
-	    }
-		cleanup();
-return 0;
 	}
 
 	private void check(int i) throws NetworkException {

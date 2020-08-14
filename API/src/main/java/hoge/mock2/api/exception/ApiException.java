@@ -7,7 +7,8 @@ public class ApiException extends AppException {
 	public enum KIND{
 		PARAM_SHORT,
 		PARAM_VAL_ERROR,
-		UI_ERROR
+		UI_ERROR,
+		NETWORK_ERROR
 	}
 
 	private KIND _kind;
@@ -27,6 +28,8 @@ public class ApiException extends AppException {
 			return "【例外】パラメータの値が不正です。数値を入力してください。" + _message;
 		case UI_ERROR:
 			return "【例外】UIでエラーが発生しました。" + _message;
+		case NETWORK_ERROR:
+			return "【例外】NETWORKでエラーが発生しました。" + _message;
 		default:
 			return "【例外】予期せぬエラーが発生";
 		}

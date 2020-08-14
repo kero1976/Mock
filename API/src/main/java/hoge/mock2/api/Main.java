@@ -15,7 +15,5 @@ public class Main {
 		} catch (ApiException e) {
 			Log.sysout("アプリケーションが異常終了しました。"  + e.getMessage());
 		}
-
 	}
-
 }
