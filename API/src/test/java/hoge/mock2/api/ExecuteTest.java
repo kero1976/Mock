@@ -4,8 +4,6 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.Test;
 
 import hoge.mock2.api.exception.ApiException;
@@ -23,10 +21,10 @@ class ExecuteTest {
 			params = new Params(new String[]{
 				"10",timeOut,"0"
 			});
-			ResultAndTimeCheck(params, 0, 10);
-		} catch (ApiException e) {
+		}catch(Exception e) {
 			fail();
 		}
+		ResultAndTimeCheck(params, 0, 10);
 	}
 
 	@Test
@@ -38,10 +36,10 @@ class ExecuteTest {
 			params = new Params(new String[]{
 				"60",timeOut,"0"
 			});
-			ResultAndTimeCheck(params, 1, 60);
 		} catch (ApiException e) {
 			fail();
 		}
+		ResultAndTimeCheck(params, 1, 60);
 	}
 
 	@Test
@@ -92,24 +90,28 @@ class ExecuteTest {
 
 	private void ResultAndTimeCheck(Params params, int returnCode, int time) {
 
-		long start = System.currentTimeMillis();
-		Execute exe = new Execute(params);
 		try {
-			int result = exe.start();
-			assertEquals(returnCode, result);
-		} catch (ApiException e) {
-			fail();
-		}
-		long end = System.currentTimeMillis();
-		long actualTime = (end - start) / 1000;
-		System.out.println("処理時間：" + actualTime);
+			long start = System.currentTimeMillis();
+			Execute exe = new Execute(params);
+			try {
+				int result = exe.start();
+				assertEquals(returnCode, result);
+			} catch (ApiException e) {
+				System.out.println("ApiExceptionが発生");
+				fail(e.getMessage());
+			}
+			long end = System.currentTimeMillis();
+			long actualTime = (end - start) / 1000;
+			System.out.println("処理時間：" + actualTime);
 
-		exe = null;
-		try {
-			TimeUnit.SECONDS.sleep(5);
-		} catch (InterruptedException e) {
-			fail();
+			assertTrue((time - 2) <= actualTime && actualTime <= (time + 2));
+		}catch(Exception e) {
+			System.out.println("Exceptionが発生");
+			e.printStackTrace();
+		}catch(Error e2) {
+			System.out.println("Errorが発生");
+			e2.printStackTrace();
 		}
-		assertTrue((time - 2) <= actualTime && actualTime <= (time + 2));
+
 	}
 }

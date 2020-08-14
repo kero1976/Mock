@@ -5,8 +5,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.eclipse.swt.widgets.Display;
-
 import hoge.mock2.api.exception.ApiException;
 import hoge.mock2.api.exception.ApiException.KIND;
 import hoge.mock2.common.Log;
@@ -31,12 +29,20 @@ class Execute {
 	    Log.sysout("通信を開始します");
 		NetworkSample network = new NetworkSample(_params.getNetworkTime(), _params.getTimeOut(), _params.isMutuushin());
 		try {
-			return network.execute();
+			int result = network.execute();
+			// ネットワークの例外出力に時間がかかるので、少し待つ
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+			Log.sysout("通信が終了しました");
+			return result;
 		}catch(NetworkException e) {
 			Log.sysout(e.toString());
 			throw new ApiException(KIND.NETWORK_ERROR, e.getMessage());
 		}finally {
-			UiClose(view, f);
+
+			Log.sysout("終了");
 		}
 	}
 
@@ -49,20 +55,5 @@ class Execute {
 	        	  return null;
 	          }
 	    });
-	}
-
-	private void UiClose(View view, Future<Void> f) {
-		if(f.isDone()) {
-			Log.sysout("画面が正しく閉じられています。");
-		}else {
-			Log.sysout("画面が表示されているので終了します");
-			Display.getDefault().syncExec(new Runnable() {
-			    public void run() {
-			     view.close();
-			    }
-			});
-		}
-		executor.shutdown();
-		Log.sysout("終了");
 	}
 }

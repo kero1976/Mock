@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 
 import hoge.mock2.common.Log;
 import hoge.mock2.common.Result;
+import hoge.mock2.common.valueObject.ExitCode;
 import hoge.mock2.network.exception.NetworkException;
 import hoge.mock2.network.exception.NetworkException.KIND;
 
@@ -94,24 +95,22 @@ public class NetworkSample {
 		    		Log.sysout("通信処理を中断します");
 		    		timer.cancel(true);
 		    		network.cancel(true);
-		    		return Result.getResult();
+		    		return Result.getResult().getIntResult();
 		    	}
 				Future<Void> result = taskCompletionService.poll();
 				if(result == null) {
 					Thread.sleep(1000);
 				}else {
 					Log.sysout("通信かタイマーのどちらかが完了しました");
-					try {
-						int returnCode = Result.getResult();
-						Log.sysout("リターンコードがセットされています。");
-						timer.cancel(true);
-						return returnCode;
-					}catch(Exception e) {
+
+					if(Result.getResult() == ExitCode.UNKNOWN) {
 						Log.sysout("リターンコードがセットされていませんでした");
 						if(_mutuushinFlg) {
 							Log.sysout("無通信と判断し処理を終了します");
+							// 通信の結果ではなく、ここでリターンコードをセットする必要がある。（通信はタイマーの存在を知らない）
 							network.cancel(true);
-							return 1;
+							Result.setResult(ExitCode.TIMEOUT);
+							return Result.getResult().getIntResult();
 						}else {
 							Log.sysout("無通信ではないので処理終了まで待機します。");
 							while(!network.isDone()) {
@@ -119,12 +118,18 @@ public class NetworkSample {
 						    	if(Result.isCancel()) {
 						    		Log.sysout("通信処理を中断します");
 						    		network.cancel(true);
-						    		return Result.getResult();
+						    		return Result.getResult().getIntResult();
 						    	}
 							}
 							network.get();
-							return 1;
+							// 通信の結果ではなく、ここでリターンコードをセットする必要がある。（通信はタイマーの存在を知らない）
+							Result.setResult(ExitCode.TIMEOUT);
+							return Result.getResult().getIntResult();
 						}
+					}else {
+						Log.sysout("リターンコードがセットされています。");
+						timer.cancel(true);
+						return Result.getResult().getIntResult();
 					}
 				}
 	    	}
@@ -132,7 +137,7 @@ public class NetworkSample {
 			Log.sysout("メイン処理で例外が発生" + e.toString());
 			throw new NetworkException(KIND.NETWORK_ERROR, e.toString());
 		}finally {
-		    stopThreadPool(taskExecutor);
+			stopThreadPool(taskExecutor);
 			cleanup();
 		}
 	}

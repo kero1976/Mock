@@ -2,6 +2,7 @@ package hoge.mock2.network;
 
 import hoge.mock2.common.Log;
 import hoge.mock2.common.Result;
+import hoge.mock2.common.valueObject.ExitCode;
 import hoge.mock2.network.exception.NetworkException;
 import hoge.mock2.network.exception.NetworkException.KIND;
 
@@ -25,7 +26,7 @@ class Fake {
 				Result.setViewData(i + "");
 			}
 			// 通信が完了したので終了コードをセットする
-			Result.setResult("0");
+			Result.setResult(ExitCode.OK);
 			Log.sysout("通信ダミー処理を終了します。");
 		} catch (InterruptedException e) {
 			Log.sysout("通信ダミー処理が終了しませんでした。");

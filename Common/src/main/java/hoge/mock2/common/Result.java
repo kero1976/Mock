@@ -1,14 +1,14 @@
 package hoge.mock2.common;
 
+import hoge.mock2.common.valueObject.ExitCode;
+
 public class Result {
 
-	private static String _result = "";
+	private static ExitCode _result = ExitCode.UNKNOWN;
 
 	private static String _viewData = "";
 
 	private static boolean _isCancel = false;
-
-	private static boolean _isTimeout = false;
 
 	public static String getViewData() {
 		return _viewData;
@@ -18,28 +18,21 @@ public class Result {
 		Result._viewData = _data;
 	}
 
-	public static int getResult() {
-		return Integer.parseInt(_result);
+	public static ExitCode getResult() {
+		return _result;
 	}
 
-	public static void setResult(String val) {
+	public static void setResult(ExitCode val) {
 		_result = val;
 	}
 
 	public static void setCancel() {
 		_isCancel = true;
-		setResult("2");
+		setResult(ExitCode.CANCEL);
 	}
 
 	public static boolean isCancel() {
 		return _isCancel;
 	}
 
-	public static void setTimeout() {
-		_isTimeout = true;
-	}
-
-	public static boolean isTimeout() {
-		return _isTimeout;
-	}
 }

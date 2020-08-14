@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Text;
 
 import hoge.mock2.common.Log;
 import hoge.mock2.common.Result;
+import hoge.mock2.common.valueObject.ExitCode;
 
 public class View {
 
@@ -42,8 +43,8 @@ public class View {
 			if (!display.readAndDispatch()) {
 				OutputText.setText(Result.getViewData());
 				shell.redraw();
-				if(Result.isCancel()) {
-
+				if(Result.getResult() != ExitCode.UNKNOWN) {
+					close();
 				}
 				display.sleep();
 			}
@@ -54,6 +55,7 @@ public class View {
 		Log.sysout("画面をクローズします");
 		shell.dispose();
 	}
+
 	/**
 	 * Create contents of the window.
 	 */
@@ -77,10 +79,5 @@ public class View {
 		btnNewButton.setBounds(122, 117, 198, 81);
 		btnNewButton.setText("中断");
 
-	}
-
-	public void cancel() {
-		Log.sysout("キャンセルが呼ばれました");
-		close();
 	}
 }
