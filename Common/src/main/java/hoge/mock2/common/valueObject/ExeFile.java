@@ -15,20 +15,24 @@ public class ExeFile {
 			throw new FileException(ERR_KIND.VALUE_IS_NULL, filePath);
 		}
 		File file = new File(filePath);
-//		try {
+		try {
 		    if (!file.exists()){
 		    	throw new FileException(ERR_KIND. FILE_NOT_FOUND, filePath);
 		    }else if(file.isDirectory()) {
 		    	throw new FileException(ERR_KIND. VALUE_IS_DIR, filePath);
 		    }
 		    this.exeFilePath = filePath;
-//		}catch(SecurityException e) {
-//			throw new FileException(ERR_KIND. FILE_NOT_FOUND, filePath, e);
-//		}
+		}catch(SecurityException e) {
+			throw new FileException(ERR_KIND.SECURITY_ERROR, filePath, e);
+		}
 
 	}
 
 	public File getExeFile() {
 		return new File(exeFilePath);
+	}
+
+	public String getExeFilePathString() {
+		return exeFilePath;
 	}
 }

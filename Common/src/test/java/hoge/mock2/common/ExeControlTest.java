@@ -2,9 +2,13 @@ package hoge.mock2.common;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import hoge.mock2.common.exception.FileException;
+import hoge.mock2.common.valueObject.Args;
 
 class ExeControlTest {
 
@@ -47,9 +51,30 @@ class ExeControlTest {
 	@Test
 	void コンストラクタのテスト_セキュリティ例外() {
 
-		FileException e = assertThrows(FileException.class,
-				() -> new ExeControl("C:\\JavaTest2\\1.txt"));
-System.out.println(e.getMessage());
-		assertTrue(e.getMessage().contains("VALUE_IS_DIR:C:\\Windows"));
+		// TODO: 未実装
+	}
+
+	@Test
+	void keytoolのテスト() {
+		try {
+			ExeControl exe = new ExeControl("G:\\Java\\pleiades\\java\\8\\bin\\keytool.exe");
+			List<String> list = new ArrayList<String>();
+			list.add("-list");
+			list.add("-keystore");
+			list.add("G:\\Java\\pleiades\\java\\8\\jre\\lib\\security\\cacerts");
+			list.add("-storepass");
+			list.add("changeit");
+
+			Args args = new Args(list);
+
+			int result = exe.execute(args);
+
+			exe.sysout();
+			assertEquals(0, result);
+		} catch (Exception e) {
+			fail("失敗");
+		}
+
+
 	}
 }
